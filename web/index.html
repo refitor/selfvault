@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <title>SelfWeb3</title>
+    <script type="module">
+      import { Buffer } from "buffer";
+      window.Buffer = Buffer;
+    </script> 
+  </head>
+  <body>
+    <!-- <script
+        src="/fhevm/relayer-sdk.umd.cjs"
+        type="text/javascript"
+    ></script> -->
+    <script type="module">
+        import {
+          initSDK,
+          createInstance,
+          SepoliaConfig,
+        // } from "https://cdn.zama.ai/relayer-sdk-js/0.2.0/relayer-sdk-js.umd.cjs";
+        } from 'https://refitor.github.io/selfvault/dapp/fhevm/relayer-sdk-js.js';
+    // } from 'http://localhost:5173/dapp/fhevm/relayer-sdk-js.js';
+      
+        await initSDK();
+        const config = { ...SepoliaConfig, network: window.ethereum };
+        config.network = window.ethereum;
+        window.fheInstance = await createInstance(config);
+    </script>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
