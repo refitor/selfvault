@@ -6,7 +6,7 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-    base: '/dapp/',
+    base: '/selfvault/dapp/',
     publicDir: 'public',
     optimizeDeps: { // 👈 optimizedeps
         esbuildOptions: {
