@@ -1,5 +1,17 @@
-私有金库SelfVault
+# SelfVault
 
-1. 为个人冷钱包提供隐私保护，通过Zama protocol支持针对冷钱包的出入金地址和金额进行加密保护
-2. 智能合约负责中转资金, 整个链路由FHE进行加密保护
-3. 前端提供deposit和withdraw入口用于出入金
+### Safe Features
+#### 1. Cold wallets do not require exporting private keys or mnemonic phrases, the on-chain address is hidden, offline signature withdrawals are supported.
+#### 2. Only one hot wallet can be bound to a cold wallet, privacy-protected assets cannot be transferred to it if it is not bound.
+#### 3. Deposits from any wallet to the cold wallet are supported, the cold wallet address and deposit amount are encrypted and hidden on the blockchain.
+#### 4. Transfers of privacy-protected assets from hot wallets to other cold wallet addresses are supported, the transfer address and deposit amount are encrypted and hidden on the blockchain.
+#### 5. Hot wallets can perform withdrawals with offline signatures from the cold wallet, and withdrawals are only supported to cold wallets.
+
+### Contract
+
+#### Sepolia: 0x4074801418A02f3Cefbc0A2Bf0ad5561634483F1
+
+### [Website](https://refitor.github.io/selfvault)
+
+### [Dapp](https://refitor.github.io/selfvault/dapp)
+
