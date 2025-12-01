@@ -13,7 +13,7 @@
 
 ### **Notice: By providing a cold wallet address and a dedicated wallet for offline signing, the cold wallet address can be completely hidden. The coldHash transmitted during the deposit process is one-way encrypted, and no plaintext information related to the cold wallet address will appear on the blockchain**
 
-### Contract
+### [Contract](https://sepolia.etherscan.io/address/0x93c7534a82b80ba72e7934d53a8be0259665e6ae)
 
 #### Sepolia: 0x93c7534a82b80Ba72e7934d53A8be0259665E6ae
 
@@ -30,3 +30,14 @@
 #### hotWallet3 ---> deposit ---: https://sepolia.etherscan.io/tx/0x74249c1d73e95b470d52f20dbfe429dea938e8163deab93120e933f590c425ba
 
 #### hotWallet3 ---> offline sign and withdraw ---> coldWallet3 : https://sepolia.etherscan.io/tx/0x6a0a6d75237a55b4421a580b81afc7fc0f641387fb9b8bb89f4b42b60212919a
+
+### ColdHash
+
+#### ColdHash as the encrypted address of hotWallet3.coldWallet:
+![coldhash-account](https://refitor.github.io/selfvault/imgs/coldhash-account.png)
+
+#### ColdHash as the deposit params: 
+![coldhash-deposit](https://refitor.github.io/selfvault/imgs/coldhash-deposit.png)
+
+#### ColdHash with online verify 
+![coldhash-verify](https://refitor.github.io/selfvault/imgs/coldhash-verify.png)
