@@ -44,11 +44,8 @@ contract SETH is ZamaEthereumConfig {
         uint256 operateNonce;
         uint256 hotWithdrawMax;
     }
-    address[] public _privateAddressList;
-    // mapping (eaddress => euint128)  public  _privateBalanceOf;
-    // mapping (eaddress => PrivateData)  public  _privateDataOf;
-    mapping (address => PrivateData)  public  _privateDataOf;
-    // mapping (address => eaddress)  public  _privateDataOf;
+    address[] private _privateAddressList;
+    mapping (address => PrivateData)  private  _privateDataOf;
 
     receive() external payable {
         deposit();
@@ -261,7 +258,12 @@ contract SETH is ZamaEthereumConfig {
         // return _privateDataOf[msg.sender];
     }
 
-    function getColdHash(address walletAddress) pure public returns (bytes32) {
+    function getColdHash(address walletAddress) view public returns (bytes32) {
+        if (walletAddress == msg.sender) {
+            if (_privateDataOf[msg.sender].coldHash != bytes32(0)) {
+                return _privateDataOf[msg.sender].coldHash;
+            }
+        }
         bytes32 typeHash = keccak256(abi.encodePacked('string Action'));
         bytes32 valueHash = keccak256(abi.encodePacked(abi.encodePacked(walletAddress)));
         return keccak256(abi.encode(typeHash, valueHash));

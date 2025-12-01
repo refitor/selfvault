@@ -1,10 +1,10 @@
-# SelfVault
+# **SelfVault**
 
 ### [Website](https://refitor.github.io/selfvault)
 
 ### [Dapp](https://refitor.github.io/selfvault/dapp)
 
-### Safe Features
+### **Safe Features**
 #### 1. Cold wallets do not require exporting private keys or mnemonic phrases, the on-chain address is hidden, offline signature withdrawals are supported.
 #### 2. Only one hot wallet can be bound to a cold wallet, privacy-protected assets cannot be transferred to it if it is not bound.
 #### 3. Deposits from any wallet to the cold wallet are supported, the cold wallet address is encrypted and hidden on the blockchain.
@@ -13,11 +13,11 @@
 
 ### **Notice: By providing a cold wallet address and a dedicated wallet for offline signing, the cold wallet address can be completely hidden. The coldHash transmitted during the deposit process is one-way encrypted, and no plaintext information related to the cold wallet address will appear on the blockchain**
 
-### [Contract](https://sepolia.etherscan.io/address/0x93c7534a82b80ba72e7934d53a8be0259665e6ae)
+### **Contract**
 
-#### Sepolia: 0x93c7534a82b80Ba72e7934d53A8be0259665E6ae
+#### Sepolia: [0xe21AC5E27721295D7AE87C4536607491e0bC2f67](https://sepolia.etherscan.io/address/0xe21AC5E27721295D7AE87C4536607491e0bC2f67)
 
-### Transaction
+### **Transaction**
 
 #### hotWallet1 ---> deposit ---: https://sepolia.etherscan.io/tx/0x8df1983f1fb36b290c62b1be7c39c37143e6db5fde995581f1844671e80054d7
 
@@ -31,7 +31,7 @@
 
 #### hotWallet3 ---> offline sign and withdraw ---> coldWallet3 : https://sepolia.etherscan.io/tx/0x6a0a6d75237a55b4421a580b81afc7fc0f641387fb9b8bb89f4b42b60212919a
 
-### ColdHash
+### **ColdHash**
 
 #### ColdHash as the encrypted address of hotWallet3.coldWallet:
 ![coldhash-account](https://refitor.github.io/selfvault/imgs/coldhash_account.png)

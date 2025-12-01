@@ -131,7 +131,7 @@
                 coinName: "ETH",
                 contractName: "SETH",
                 selfETH: {
-                    "0xaa36a7": "0x93c7534a82b80Ba72e7934d53A8be0259665E6ae",
+                    "0xaa36a7": "0xe21AC5E27721295D7AE87C4536607491e0bC2f67",
                     "ABI": SelfETHABI,
                     contract: {}
                 },
