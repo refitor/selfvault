@@ -50,6 +50,7 @@
                     style="margin-top: 20px; margin-left: 10px;">Transfer</Button> -->
                 <Select :disabled="!hideSpin || walletMode ==='cold'" style="width:140px; margin-left: 10px; margin-top: 20px;" placeholder="Action" @on-select="selectAction">
                     <Option value="Transfer">Transfer</Option>
+                    <Option value="FundsProof" disabled>Proof of funds</Option>
                     <Option value="DecryptBalance">Decrypt Balance</Option>
                     <Option value="DecryptAddress">Decrypt Address</Option>
                 </Select>
@@ -130,7 +131,7 @@
                 coinName: "ETH",
                 contractName: "SETH",
                 selfETH: {
-                    "0xaa36a7": "0xaCD6A39f288cB973C25badCdAc6Ae93176573662",
+                    "0xaa36a7": "0x93c7534a82b80Ba72e7934d53A8be0259665E6ae",
                     "ABI": SelfETHABI,
                     contract: {}
                 },
@@ -201,7 +202,9 @@
             },
             async updateBalance() {
                 try {
-                    let eaddr = await this.selfETH.contract.privateAddress();
+                    const walletAddress = ethers.getAddress(this.wallet.getAccount());
+                    const coldHash = await this.selfETH.contract.getColdHash(walletAddress);
+                    let eaddr = coldHash; //await this.selfETH.contract.privateAddress(coldHash);
                     console.log("get privateAddress ok:", eaddr);
                     if (eaddr !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
                         this.eWalletAddress = eaddr;
@@ -251,12 +254,12 @@
                 const coldAddress = ethers.getAddress(this.inputWalletAddress);
                 const coldHash = await this.selfETH.contract.getColdHash(coldAddress);
                 const walletAddress = ethers.getAddress(this.wallet.getAccount());
-                const ciphertexts = await this.encrypt(coldAddress);
-                console.log(ciphertexts, coldHash)
+                // const ciphertexts = await this.encrypt(coldAddress);
+                // console.log(ciphertexts, coldHash)
 
-                const gasLimit = await this.selfETH.contract.privateDeposit.estimateGas(coldHash, ciphertexts.handles[0], ciphertexts.inputProof, BigInt(hotWithdrawMax * 100));
+                const gasLimit = await this.selfETH.contract.privateDeposit.estimateGas(coldHash, BigInt(hotWithdrawMax * 100));
                 let options = { from: walletAddress, value: inputAmount, gasLimit: BigInt(gasLimit), gasPrice: (await this.wallet.provider.getFeeData()).gasPrice };//, nonce: nonce}
-                const sentTx = await this.selfETH.contract.privateDeposit(coldHash, ciphertexts.handles[0], ciphertexts.inputProof, BigInt(hotWithdrawMax * 100), options);
+                const sentTx = await this.selfETH.contract.privateDeposit(coldHash, BigInt(hotWithdrawMax * 100), options);
                 await sentTx.wait(1);
                 return sentTx.hash;
             },
@@ -293,6 +296,95 @@
                     await sentTx.wait(1);
                     return sentTx.hash;
                 }
+            },
+            async transfer() {
+                if (this.inputWalletAddress === "") {
+                    this.$Message.warning('Please enter the destination wallet address');
+                    return "";
+                }
+                if (parseFloat(this.inputAmount) <= 0) {
+                    this.$Message.warning('Please enter the valid amount');
+                    return "";
+                }
+                const inputAddr = ethers.getAddress(this.inputWalletAddress);
+                const inputAmount = ethers.parseEther(this.inputAmount);
+                const walletAddress = ethers.getAddress(this.wallet.getAccount());
+                const inputColdHash = await this.selfETH.contract.getColdHash(inputAddr);
+
+                const ciphertexts = await this.encrypt("", inputAmount, true);
+                console.log("ciphertexts", ciphertexts)
+
+                const gasLimit = await this.selfETH.contract.privateTransfer.estimateGas(inputColdHash, ciphertexts.handles[0], ciphertexts.inputProof);
+                console.log("before transfer, gasLimit:", gasLimit)
+                let options = { from: walletAddress, value: BigInt(0), gasLimit: BigInt(300000), gasPrice: (await this.wallet.provider.getFeeData()).gasPrice };//, nonce: nonce}
+                const sentTx = await this.selfETH.contract.privateTransfer(inputColdHash, ciphertexts.handles[0], ciphertexts.inputProof, options);
+                await sentTx.wait(1);
+                return sentTx.hash;
+            },
+            async fundsProof() {
+                this.$Message.warning('Not supported at present');
+            },
+            async encrypt(coldAddress, amount, bTransfer) {
+                const walletAddress = ethers.getAddress(this.wallet.getAccount());
+                const contractAddress = ethers.getAddress(this.selfETH[this.wallet.chainId]);
+                console.log("=======", coldAddress, contractAddress, walletAddress)
+
+                // We first create a buffer for values to encrypt and register to the fhevm
+                let buffer = await window.fheInstance.createEncryptedInput(
+                    // The address of the contract allowed to interact with the "fresh" ciphertexts
+                    contractAddress,
+                    // The address of the entity allowed to import ciphertexts to the contract at `contractAddress`
+                    walletAddress,
+                )
+                if (coldAddress !== "") buffer = buffer.addAddress(coldAddress);
+                if (amount !== undefined) buffer.add128(amount);
+                const ciphertexts = await buffer.encrypt();
+                console.log("ciphertexts", ciphertexts)
+                return ciphertexts;
+            },
+            async decrypt(ciphertextHandle) {
+                const contractAddress = ethers.getAddress(this.selfETH[this.wallet.chainId]);
+                const keypair = window.fheInstance.generateKeypair();
+                const handleContractPairs = [
+                    {
+                        handle: ciphertextHandle,
+                        contractAddress: contractAddress,
+                    },
+                ];
+                const startTimeStamp = Math.floor(Date.now() / 1000).toString();
+                const durationDays = '10'; // String for consistency
+                const contractAddresses = [contractAddress];
+
+                console.log("before decrypt: ", ciphertextHandle, contractAddress)
+
+                const eip712 = window.fheInstance.createEIP712(
+                    keypair.publicKey,
+                    contractAddresses,
+                    startTimeStamp,
+                    durationDays,
+                );
+
+                const signer = this.wallet.signer;
+                const signature = await signer.signTypedData(
+                    eip712.domain,
+                    {
+                        UserDecryptRequestVerification: eip712.types.UserDecryptRequestVerification,
+                    },
+                    eip712.message,
+                );
+
+                const result = await window.fheInstance.userDecrypt(
+                    handleContractPairs,
+                    keypair.privateKey,
+                    keypair.publicKey,
+                    signature.replace('0x', ''),
+                    contractAddresses,
+                    signer.address,
+                    startTimeStamp,
+                    durationDays,
+                );
+                const decryptedValue = result[ciphertextHandle];
+                return decryptedValue;
             },
             async offlineSignx() {
                 let self = this;
@@ -356,90 +448,6 @@
                     });
                 }
                 return "";
-            },
-            async transfer() {
-                if (this.inputWalletAddress === "") {
-                    this.$Message.warning('Please enter the destination wallet address');
-                    return "";
-                }
-                if (parseFloat(this.inputAmount) <= 0) {
-                    this.$Message.warning('Please enter the valid amount');
-                    return "";
-                }
-                const inputAddr = ethers.getAddress(this.inputWalletAddress);
-                const inputAmount = ethers.parseEther(this.inputAmount);
-                const walletAddress = ethers.getAddress(this.wallet.getAccount());
-
-                const ciphertexts = await this.encrypt(inputAddr, inputAmount, true);
-                console.log("ciphertexts", ciphertexts)
-
-                const gasLimit = await this.selfETH.contract.privateTransfer.estimateGas(ciphertexts.handles[0], ciphertexts.handles[1], ciphertexts.inputProof);
-                let options = { from: walletAddress, gasLimit: BigInt(gasLimit), gasPrice: (await this.wallet.provider.getFeeData()).gasPrice };//, nonce: nonce}
-                const sentTx = await this.selfETH.contract.privateTransfer(ciphertexts.handles[0], ciphertexts.handles[1], ciphertexts.inputProof, options);
-                await sentTx.wait(1);
-                return sentTx.hash;
-            },
-            async encrypt(coldAddress, amount, bTransfer) {
-                const walletAddress = ethers.getAddress(this.wallet.getAccount());
-                const contractAddress = ethers.getAddress(this.selfETH[this.wallet.chainId]);
-                console.log("=======", coldAddress, contractAddress, walletAddress)
-
-                // We first create a buffer for values to encrypt and register to the fhevm
-                let buffer = await window.fheInstance.createEncryptedInput(
-                    // The address of the contract allowed to interact with the "fresh" ciphertexts
-                    contractAddress,
-                    // The address of the entity allowed to import ciphertexts to the contract at `contractAddress`
-                    walletAddress,
-                )
-                buffer = buffer.addAddress(coldAddress);
-                if (amount !== undefined) buffer.add128(amount);
-                const ciphertexts = await buffer.encrypt();
-                console.log("ciphertexts", ciphertexts)
-                return ciphertexts;
-            },
-            async decrypt(ciphertextHandle) {
-                const contractAddress = ethers.getAddress(this.selfETH[this.wallet.chainId]);
-                const keypair = window.fheInstance.generateKeypair();
-                const handleContractPairs = [
-                    {
-                        handle: ciphertextHandle,
-                        contractAddress: contractAddress,
-                    },
-                ];
-                const startTimeStamp = Math.floor(Date.now() / 1000).toString();
-                const durationDays = '10'; // String for consistency
-                const contractAddresses = [contractAddress];
-
-                console.log("before decrypt: ", ciphertextHandle, contractAddress)
-
-                const eip712 = window.fheInstance.createEIP712(
-                    keypair.publicKey,
-                    contractAddresses,
-                    startTimeStamp,
-                    durationDays,
-                );
-
-                const signer = this.wallet.signer;
-                const signature = await signer.signTypedData(
-                    eip712.domain,
-                    {
-                        UserDecryptRequestVerification: eip712.types.UserDecryptRequestVerification,
-                    },
-                    eip712.message,
-                );
-
-                const result = await window.fheInstance.userDecrypt(
-                    handleContractPairs,
-                    keypair.privateKey,
-                    keypair.publicKey,
-                    signature.replace('0x', ''),
-                    contractAddresses,
-                    signer.address,
-                    startTimeStamp,
-                    durationDays,
-                );
-                const decryptedValue = result[ciphertextHandle];
-                return decryptedValue;
             }
         }
     }
