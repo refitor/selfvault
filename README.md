@@ -9,7 +9,7 @@
 
 ### Contract
 
-#### Sepolia: 0x4074801418A02f3Cefbc0A2Bf0ad5561634483F1
+#### Sepolia: 0xaCD6A39f288cB973C25badCdAc6Ae93176573662
 
 ### [Website](https://refitor.github.io/selfvault)
 
