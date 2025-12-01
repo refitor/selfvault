@@ -32404,7 +32404,7 @@ const NA = {
     // Gateway chain id
     gatewayChainId: 10901,
     // Optional RPC provider to host chain
-    network: "https://ethereum-sepolia-public.nodies.app", //'https://eth-sepolia.public.blastapi.io',
+    network: "https://white-lively-sailboat.ethereum-sepolia.quiknode.pro/6e81f79d821a3866f0c8ed2defd98be1f878c6c9/", //'https://eth-sepolia.public.blastapi.io',
     // Relayer URL
     relayerUrl: 'https://relayer.testnet.zama.org',
 }, LA = async (n) => {
