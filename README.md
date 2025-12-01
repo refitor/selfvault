@@ -34,10 +34,10 @@
 ### ColdHash
 
 #### ColdHash as the encrypted address of hotWallet3.coldWallet:
-![coldhash-account](https://refitor.github.io/selfvault/imgs/coldhash-account.png)
+![coldhash-account](https://refitor.github.io/selfvault/imgs/coldhash_account.png)
 
 #### ColdHash as the deposit params: 
-![coldhash-deposit](https://refitor.github.io/selfvault/imgs/coldhash-deposit.png)
+![coldhash-deposit](https://refitor.github.io/selfvault/imgs/coldhash_deposit.png)
 
 #### ColdHash with online verify 
-![coldhash-verify](https://refitor.github.io/selfvault/imgs/coldhash-verify.png)
+![coldhash-verify](https://refitor.github.io/selfvault/imgs/coldhash_verify.png)
