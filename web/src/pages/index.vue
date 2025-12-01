@@ -3,7 +3,7 @@
         <div v-show="!showSpin">
             <Row>
                 <Col span="12">
-                    <Select v-model="activeWallet" style="width:105px; margin: 10px;" placeholder="Select wallet" @on-select="selectWallet">
+                    <Select v-model="activeWallet" disabled style="width:105px; margin: 10px;" placeholder="Select wallet" @on-select="selectWallet">
                         <Option value="hot">Hot wallet</Option>
                         <Option value="cold">Cold wallet</Option>
                     </Select>
