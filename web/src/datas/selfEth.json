@@ -5,64 +5,6 @@
     },
     {
       "type": "function",
-      "name": "_privateAddressList",
-      "inputs": [
-        {
-          "name": "",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "",
-          "type": "address",
-          "internalType": "address"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "_privateDataOf",
-      "inputs": [
-        {
-          "name": "",
-          "type": "address",
-          "internalType": "address"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "coldHash",
-          "type": "bytes32",
-          "internalType": "bytes32"
-        },
-        {
-          "name": "balance",
-          "type": "bytes32",
-          "internalType": "euint128"
-        },
-        {
-          "name": "hotWallet",
-          "type": "address",
-          "internalType": "address"
-        },
-        {
-          "name": "operateNonce",
-          "type": "uint256",
-          "internalType": "uint256"
-        },
-        {
-          "name": "hotWithdrawMax",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
       "name": "allowance",
       "inputs": [
         {
@@ -249,18 +191,31 @@
     {
       "type": "function",
       "name": "privateAddress",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "privAddress",
+          "type": "bytes32",
+          "internalType": "eaddress"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "privateAddressOf",
       "inputs": [
         {
-          "name": "coldHash",
-          "type": "bytes32",
-          "internalType": "bytes32"
+          "name": "cold",
+          "type": "address",
+          "internalType": "address"
         }
       ],
       "outputs": [
         {
-          "name": "hotWallet",
-          "type": "address",
-          "internalType": "address"
+          "name": "privAddress",
+          "type": "bytes32",
+          "internalType": "eaddress"
         }
       ],
       "stateMutability": "view"
@@ -301,6 +256,16 @@
           "internalType": "bytes32"
         },
         {
+          "name": "to",
+          "type": "bytes32",
+          "internalType": "externalEaddress"
+        },
+        {
+          "name": "inputProof",
+          "type": "bytes",
+          "internalType": "bytes"
+        },
+        {
           "name": "hotWithdrawMax",
           "type": "uint256",
           "internalType": "uint256"
@@ -314,9 +279,9 @@
       "name": "privateTransfer",
       "inputs": [
         {
-          "name": "toColdHash",
+          "name": "encryptedTo",
           "type": "bytes32",
-          "internalType": "bytes32"
+          "internalType": "externalEaddress"
         },
         {
           "name": "encryptedAmount",

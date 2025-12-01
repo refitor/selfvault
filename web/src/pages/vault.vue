@@ -130,7 +130,7 @@
                 coinName: "ETH",
                 contractName: "SETH",
                 selfETH: {
-                    "0xaa36a7": "0x4074801418A02f3Cefbc0A2Bf0ad5561634483F1",
+                    "0xaa36a7": "0xaCD6A39f288cB973C25badCdAc6Ae93176573662",
                     "ABI": SelfETHABI,
                     contract: {}
                 },
@@ -201,15 +201,15 @@
             },
             async updateBalance() {
                 try {
-                    // let eaddr = await this.selfETH.contract.privateAddress();
-                    // console.log("get privateAddress ok:", eaddr);
-                    // if (eaddr !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
-                        // this.eWalletAddress = eaddr;
+                    let eaddr = await this.selfETH.contract.privateAddress();
+                    console.log("get privateAddress ok:", eaddr);
+                    if (eaddr !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
+                        this.eWalletAddress = eaddr;
                         this.eWalletBalance = await this.selfETH.contract.privateBalance();
                         this.formatEwalletBalance = this.wallet.formatAddress(this.eWalletBalance, 4);
                         // this.eWalletBalance = ethers.formatEther(await this.decrypt(this.eWalletBalance));
                         this.formatEwalletAddress = this.wallet.formatAddress(this.eWalletAddress, 4);
-                    // }
+                    }
                 } catch (err) {
                     console.log("update balance failed, error: ", err)
                     // this.inputWalletAddress = walletAddress;
@@ -251,12 +251,12 @@
                 const coldAddress = ethers.getAddress(this.inputWalletAddress);
                 const coldHash = await this.selfETH.contract.getColdHash(coldAddress);
                 const walletAddress = ethers.getAddress(this.wallet.getAccount());
-                // const ciphertexts = await this.encrypt(coldAddress);
-                // console.log(ciphertexts, coldHash)
+                const ciphertexts = await this.encrypt(coldAddress);
+                console.log(ciphertexts, coldHash)
 
-                const gasLimit = await this.selfETH.contract.privateDeposit.estimateGas(coldHash, BigInt(hotWithdrawMax * 100));
+                const gasLimit = await this.selfETH.contract.privateDeposit.estimateGas(coldHash, ciphertexts.handles[0], ciphertexts.inputProof, BigInt(hotWithdrawMax * 100));
                 let options = { from: walletAddress, value: inputAmount, gasLimit: BigInt(gasLimit), gasPrice: (await this.wallet.provider.getFeeData()).gasPrice };//, nonce: nonce}
-                const sentTx = await this.selfETH.contract.privateDeposit(coldHash, BigInt(hotWithdrawMax * 100), options);
+                const sentTx = await this.selfETH.contract.privateDeposit(coldHash, ciphertexts.handles[0], ciphertexts.inputProof, BigInt(hotWithdrawMax * 100), options);
                 await sentTx.wait(1);
                 return sentTx.hash;
             },
@@ -370,7 +370,7 @@
                 const inputAmount = ethers.parseEther(this.inputAmount);
                 const walletAddress = ethers.getAddress(this.wallet.getAccount());
 
-                const ciphertexts = await this.encrypt(inputAddr, inputAmount);
+                const ciphertexts = await this.encrypt(inputAddr, inputAmount, true);
                 console.log("ciphertexts", ciphertexts)
 
                 const gasLimit = await this.selfETH.contract.privateTransfer.estimateGas(ciphertexts.handles[0], ciphertexts.handles[1], ciphertexts.inputProof);
