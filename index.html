@@ -91,17 +91,11 @@
 
                 <div class="col-12 ml-md-auto col-md-7 col-lg-6 pb-5 pb-md-0">
                     <h2 style="text-align: center,">Safe Features</h2>
-                    <p class="lead">1. Cold wallets do not require exporting private keys or mnemonic phrases, the
-                        on-chain address is hidden, offline signature withdrawals are supported.</p>
-                    <p class="lead">2. Only one hot wallet can be bound to a cold wallet, privacy-protected assets
-                        cannot be transferred to it if it is not bound.</p>
-                    <p class="lead">3. Deposits from any wallet to the cold wallet are supported, the cold wallet
-                        address and deposit amount are encrypted and hidden on the blockchain.</p>
-                    <p class="lead">4. Transfers of privacy-protected assets from hot wallets to other cold wallet
-                        addresses are supported, the transfer address and deposit amount are encrypted and hidden on the
-                        blockchain.</p>
-                    <p class="lead">5. Hot wallets can perform withdrawals with offline signatures from the cold wallet,
-                        and withdrawals are only supported to cold wallets.</p>
+                    <p class="lead">1. Cold wallets do not require exporting private keys or mnemonic phrases, the on-chain address is hidden, by providing a cold wallet address and a dedicated wallet for offline signing, the cold wallet address can be completely hidden. The coldHash transmitted during the deposit process is one-way encrypted, and no plaintext information related to the cold wallet address will appear on the blockchain</p>
+                    <p class="lead">2. Only one hot wallet can be bound to a cold wallet, privacy-protected assets cannot be transferred to it if it is not bound</p>
+                    <p class="lead">3. Deposits from any wallet to the cold wallet are supported, the cold wallet address is encrypted and hidden on the blockchain</p>
+                    <p class="lead">4. Transfers of privacy-protected assets from cold wallet to other cold wallet addresses are supported, the transfer address and deposit amount are encrypted and hidden on the blockchain</p>
+                    <p class="lead">5. Hot wallets can perform withdrawals with offline signatures from the cold wallet, and withdrawals are only supported to cold wallets</p>
                     <!--p class="mt-4">
                 <a class="btn btn-secondary" href="/auth/#/demo">Demo</a>
                 </p-->
