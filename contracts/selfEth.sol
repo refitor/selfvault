@@ -38,11 +38,12 @@ contract SETH is ZamaEthereumConfig {
     mapping (address => mapping (address => uint))  public  allowance;
 
     struct PrivateData {
+        bool initialized;
         bytes32 coldHash;
         euint128 balance;
-        address hotWallet;
         uint256 operateNonce;
         uint256 hotWithdrawMax;
+        euint128 waitWithdrawAmount;
     }
     address[] private _privateAddressList;
     mapping (address => PrivateData)  private  _privateDataOf;
@@ -92,35 +93,37 @@ contract SETH is ZamaEthereumConfig {
         return true;
     }
 
-    // @notice privateDeposit is used to deposit SETH to cold wallet, demo: wallet === send 1 SETH ===> cold wallet.
+    // @notice privateDeposit is used to deposit SETH to the cold wallet, demo: wallet === send 1 SETH ===> cold wallet.
     function privateDeposit(bytes32 coldHash, uint256 hotWithdrawMax) public payable {
         // eaddress eto = FHE.fromExternal(to, inputProof);
         PrivateData memory privData = _privateDataOf[msg.sender];
 
-        // bytes32[] memory cts1 = new bytes32[](1);
-        // bytes32[] memory cts2 = new bytes32[](1);
-        // cts1[0] = FHE.toBytes32(FHE.asEbool(true));
-        // cts2[0] = FHE.toBytes32(FHE.eq(eto, privateAddress()));
-        // require(cts1[0] != cts2[0], "Duplicate binding");
-
-        // euint128 eamount = FHE.fromExternal(encryptedAmount, inputProof);
         euint128 eamount = FHE.asEuint128(uint128(msg.value));
         privData.balance = FHE.add(privData.balance, eamount);
         FHE.allowThis(privData.balance);
         FHE.allow(privData.balance, msg.sender);
 
         if (privData.coldHash == bytes32(0)) {
+            privData.initialized = true;
             privData.coldHash = coldHash;
-            privData.hotWallet = msg.sender;
+            // privData.coldAddress = eto;
             privData.hotWithdrawMax = hotWithdrawMax;
             _privateAddressList.push(msg.sender);
         }
         _privateDataOf[msg.sender] = privData;
-        // _privateDataOf[msg.sender] = eto;
     }
 
-    // @notice privateWithdraw is used to send ETH from hot wallet to cold wallet, demo: hot wallet === send 1 ETH ===> cold wallet.
-    function privateWithdrawForCold(bytes memory signature, bytes memory message, uint128 amount, uint256 nonce) public {
+    // @notice requestWithdraw is used to enable Permanent Public Access
+    function requestWithdraw(uint128 amount) public {
+        PrivateData memory privData = _privateDataOf[msg.sender];
+        euint128 eamount = FHE.asEuint128(amount);
+        privData.waitWithdrawAmount = FHE.select(FHE.ge(privData.balance, eamount), eamount, FHE.asEuint128(0));
+        FHE.makePubliclyDecryptable(privData.waitWithdrawAmount);
+        _privateDataOf[msg.sender] = privData;
+    }
+
+    // @notice privateWithdraw is used to withdrawal ETH from the SETh contract, demo: SETH === send 1 ETH ===> cold wallet.
+    function privateWithdrawForCold(bytes memory signature, bytes memory message, uint128 amount, uint256 nonce, bytes memory publicDecryptionProof) public {
         address cold = walletSignatureVerify(signature, message);
         bytes32 coldHash = getColdHash(cold);
         address hotWallet = getHotWallet(coldHash);
@@ -129,11 +132,15 @@ contract SETH is ZamaEthereumConfig {
         require(privData.operateNonce < nonce, "Invalid signature");
         require(privData.coldHash == coldHash, "Permission denied");
 
-        // euint128 eamount = FHE.fromExternal(encryptedAmount, inputProof);
-        euint128 eamount = FHE.asEuint128(amount);
-        _withdraw(cold, amount);
+        // withdraw amount check
+        bytes memory abiWithdrawAmount = abi.encode([amount]);
+        bytes32[] memory ciphertextEbalance = new bytes32[](1);
+        ciphertextEbalance[0] = FHE.toBytes32(privData.waitWithdrawAmount);
+        FHE.checkSignatures(ciphertextEbalance, abiWithdrawAmount, publicDecryptionProof);
 
-        privData.balance = FHE.sub(privData.balance, eamount);
+        _withdraw(cold, amount);
+        
+        privData.balance = FHE.sub(privData.balance, privData.waitWithdrawAmount);
         FHE.allowThis(privData.balance);
         FHE.allow(privData.balance, msg.sender);
 
@@ -141,14 +148,21 @@ contract SETH is ZamaEthereumConfig {
         _privateDataOf[hotWallet] = privData;
     }
 
-    function privateWithdraw(uint128 amount) public {
+    // @notice privateWithdraw is used to withdrawal ETH from the SETh contract, demo: SETH === send 1 ETH ===> hot wallet.
+    function privateWithdraw(uint128 amount, bytes memory publicDecryptionProof) public {
         PrivateData memory privData = _privateDataOf[msg.sender];
 
         require(address(this).balance * privData.hotWithdrawMax > amount, "Exceeding the maximum withdrawal limit");
-        // euint128 eamount = FHE.fromExternal(encryptedAmount, inputProof);
-        euint128 eamount = FHE.asEuint128(amount);
+
+        // withdraw amount check
+        bytes memory abiWithdrawAmount = abi.encode([amount]);
+        bytes32[] memory ciphertextEbalance = new bytes32[](1);
+        ciphertextEbalance[0] = FHE.toBytes32(privData.waitWithdrawAmount);
+        FHE.checkSignatures(ciphertextEbalance, abiWithdrawAmount, publicDecryptionProof);
+
         _withdraw(msg.sender, amount);
 
+        euint128 eamount = FHE.asEuint128(amount);
         privData.balance = FHE.sub(privData.balance, eamount);
         FHE.allowThis(privData.balance);
         FHE.allow(privData.balance, msg.sender);
@@ -157,16 +171,6 @@ contract SETH is ZamaEthereumConfig {
     }
 
     function _withdraw(address receiver, uint128 amount) private {
-        // // require(address(this).balance > amount, "Insufficient balance");
-        // // bytes32[] memory cts1 = new bytes32[](1);
-        // // bytes32[] memory cts2 = new bytes32[](1);
-        // // euint128 eamount = FHE.asEuint128(amount);
-        // // eaddress eto = privateAddress();
-        // bytes32[] memory cts1 = new bytes32[](1);
-        // bytes32[] memory cts2 = new bytes32[](1);
-        // cts2[0] = FHE.toBytes32(FHE.ge(privData.balance, eamount));
-        // require(cts1[0] == cts2[0], "Insufficient balance of enctyptd amount");
-
         require(address(this).balance > amount, "Insufficient balance");
         payable(receiver).transfer(amount);
         emit Withdrawal(receiver, amount);
@@ -175,18 +179,15 @@ contract SETH is ZamaEthereumConfig {
     // @notice privateTransfer is used to transfer SETH to other cold wallet, demo: cold wallet1 === transfer 1 SETH ===> cold wallet2.
     function privateTransfer(bytes32 toColdHash, externalEuint128 encryptedAmount, bytes calldata inputProof) public returns (bool) {
         address toHotWallet = getHotWallet(toColdHash);
+        bytes32 fromColdHash = getColdHash(msg.sender);
         PrivateData memory privDataTo = _privateDataOf[toHotWallet];
         PrivateData memory privDataFrom = _privateDataOf[msg.sender];
-        euint128 eamount = FHE.fromExternal(encryptedAmount, inputProof);
+        euint128 inputEamount = FHE.fromExternal(encryptedAmount, inputProof);
+        
+        require(privDataTo.initialized == true, "Permission denied");
+        require(privDataFrom.coldHash == fromColdHash, "Invalid sender");
 
-        require(privDataFrom.hotWallet == msg.sender, "Invalid sender");
-        require(privDataTo.hotWallet != address(0), "Permission denied");
-
-        // bytes32[] memory ctsFrom1 = new bytes32[](1);
-        // bytes32[] memory ctsFrom2 = new bytes32[](1);
-        // ctsFrom2[0] = FHE.toBytes32(FHE.ge(_privateBalanceOf[efrom].balance, eamount));
-        // require(ctsFrom1[0] == ctsFrom2[0], "Insufficient balance of enctyptd amount");
-
+        euint128 eamount = FHE.select(FHE.ge(privDataFrom.balance, inputEamount), inputEamount, FHE.asEuint128(0));
         privDataTo.balance = FHE.add(privDataTo.balance, eamount);
         privDataFrom.balance = FHE.sub(privDataFrom.balance, eamount);
         FHE.allowThis(privDataFrom.balance);
@@ -202,6 +203,11 @@ contract SETH is ZamaEthereumConfig {
         _privateDataOf[msg.sender] = privDataFrom;
 
         return true;
+    }
+
+    function waitWithdrawAmount() view public returns(euint128) {
+        PrivateData memory privData = _privateDataOf[msg.sender];
+        return privData.waitWithdrawAmount;
     }
 
     // @notice privateBalance is used to get balance for the hot wallet.
@@ -221,8 +227,10 @@ contract SETH is ZamaEthereumConfig {
         return balance;
     }
 
-    function fundsProof(address wallet, externalEuint128 encryptedAmount, bytes calldata inputProof) public returns (ebool bok) {
-        euint128 eamount = FHE.fromExternal(encryptedAmount, inputProof);
+    // @notice fundsProof is used to prove that a specified wallet address has a balance greater than a certain amount when the balance is hidden.
+    function fundsProof(address wallet, uint128 amount) public returns (ebool bok) {
+        // euint128 eamount = FHE.fromExternal(encryptedAmount, inputProof);
+        euint128 eamount = FHE.asEuint128(amount);
         bytes32 coldHash = getColdHash(wallet);
         for (uint i = 0; i < _privateAddressList.length; i++) {
             if (_privateDataOf[_privateAddressList[i]].coldHash == coldHash) {
@@ -235,29 +243,18 @@ contract SETH is ZamaEthereumConfig {
         return bok;
     }
 
-    // @notice privateAddress is used to get the cold wallet address encrypted by Zama protocol.
-    function privateAddress(bytes32 coldHash) view public returns (address hotWallet) {
-        for (uint i = 0; i < _privateAddressList.length; i++) {
-            if (_privateDataOf[_privateAddressList[i]].coldHash == coldHash) {
-                hotWallet = _privateAddressList[i];
-                break;
-            }
-        }
-        return hotWallet;
-        // return _privateDataOf[msg.sender];
-    }
+    // // @notice privateAddress is used to get the cold wallet address encrypted by Zama protocol.
+    // function privateAddress(bytes32 coldHash) view public returns (eaddress privAddr) {
+    //     for (uint i = 0; i < _privateAddressList.length; i++) {
+    //         if (_privateDataOf[_privateAddressList[i]].coldHash == coldHash) {
+    //             privAddr = _privateDataOf[_privateAddressList[i]].coldAddress;
+    //             break;
+    //         }
+    //     }
+    //     return privAddr;
+    // }
 
-    function getHotWallet(bytes32 coldHash) view public returns (address hotWallet) {
-        for (uint i = 0; i < _privateAddressList.length; i++) {
-            if (_privateDataOf[_privateAddressList[i]].coldHash == coldHash) {
-                hotWallet = _privateAddressList[i];
-                break;
-            }
-        }
-        return hotWallet;
-        // return _privateDataOf[msg.sender];
-    }
-
+    // @notice getColdHash is used to get the cold wallet hash encrypted by keccak256.
     function getColdHash(address walletAddress) view public returns (bytes32) {
         if (walletAddress == msg.sender) {
             if (_privateDataOf[msg.sender].coldHash != bytes32(0)) {
@@ -288,5 +285,16 @@ contract SETH is ZamaEthereumConfig {
      */
     function keySignatureVerify(bytes memory signature, bytes memory message) pure public returns (address) {
         return keccak256(abi.encodePacked(message)).recover(signature);
+    }
+
+    // @notice getHotWallet is used to get the hot wallet address bound to the cold wallet.
+    function getHotWallet(bytes32 coldHash) view private returns (address hotWallet) {
+        for (uint i = 0; i < _privateAddressList.length; i++) {
+            if (_privateDataOf[_privateAddressList[i]].coldHash == coldHash) {
+                hotWallet = _privateAddressList[i];
+                break;
+            }
+        }
+        return hotWallet;
     }
 }
