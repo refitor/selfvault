@@ -5,64 +5,6 @@
     },
     {
       "type": "function",
-      "name": "_privateAddressList",
-      "inputs": [
-        {
-          "name": "",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "",
-          "type": "address",
-          "internalType": "address"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "_privateDataOf",
-      "inputs": [
-        {
-          "name": "",
-          "type": "address",
-          "internalType": "address"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "coldHash",
-          "type": "bytes32",
-          "internalType": "bytes32"
-        },
-        {
-          "name": "balance",
-          "type": "bytes32",
-          "internalType": "euint128"
-        },
-        {
-          "name": "hotWallet",
-          "type": "address",
-          "internalType": "address"
-        },
-        {
-          "name": "operateNonce",
-          "type": "uint256",
-          "internalType": "uint256"
-        },
-        {
-          "name": "hotWithdrawMax",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
       "name": "allowance",
       "inputs": [
         {
@@ -171,14 +113,9 @@
           "internalType": "address"
         },
         {
-          "name": "encryptedAmount",
-          "type": "bytes32",
-          "internalType": "externalEuint128"
-        },
-        {
-          "name": "inputProof",
-          "type": "bytes",
-          "internalType": "bytes"
+          "name": "amount",
+          "type": "uint128",
+          "internalType": "uint128"
         }
       ],
       "outputs": [
@@ -205,25 +142,6 @@
           "name": "",
           "type": "bytes32",
           "internalType": "bytes32"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "getHotWallet",
-      "inputs": [
-        {
-          "name": "coldHash",
-          "type": "bytes32",
-          "internalType": "bytes32"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "hotWallet",
-          "type": "address",
-          "internalType": "address"
         }
       ],
       "stateMutability": "view"
@@ -261,25 +179,6 @@
           "name": "",
           "type": "string",
           "internalType": "string"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "privateAddress",
-      "inputs": [
-        {
-          "name": "coldHash",
-          "type": "bytes32",
-          "internalType": "bytes32"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "hotWallet",
-          "type": "address",
-          "internalType": "address"
         }
       ],
       "stateMutability": "view"
@@ -365,6 +264,11 @@
           "name": "amount",
           "type": "uint128",
           "internalType": "uint128"
+        },
+        {
+          "name": "publicDecryptionProof",
+          "type": "bytes",
+          "internalType": "bytes"
         }
       ],
       "outputs": [],
@@ -393,6 +297,24 @@
           "name": "nonce",
           "type": "uint256",
           "internalType": "uint256"
+        },
+        {
+          "name": "publicDecryptionProof",
+          "type": "bytes",
+          "internalType": "bytes"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "requestWithdraw",
+      "inputs": [
+        {
+          "name": "amount",
+          "type": "uint128",
+          "internalType": "uint128"
         }
       ],
       "outputs": [],
@@ -479,6 +401,19 @@
     },
     {
       "type": "function",
+      "name": "waitWithdrawAmount",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "euint128"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
       "name": "walletSignatureVerify",
       "inputs": [
         {
@@ -560,6 +495,25 @@
     },
     {
       "type": "event",
+      "name": "PublicDecryptionVerified",
+      "inputs": [
+        {
+          "name": "handlesList",
+          "type": "bytes32[]",
+          "indexed": false,
+          "internalType": "bytes32[]"
+        },
+        {
+          "name": "abiEncodedCleartexts",
+          "type": "bytes",
+          "indexed": false,
+          "internalType": "bytes"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
       "name": "Transfer",
       "inputs": [
         {
@@ -628,6 +582,11 @@
           "internalType": "bytes32"
         }
       ]
+    },
+    {
+      "type": "error",
+      "name": "InvalidKMSSignatures",
+      "inputs": []
     },
     {
       "type": "error",

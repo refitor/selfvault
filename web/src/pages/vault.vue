@@ -131,7 +131,7 @@
                 coinName: "ETH",
                 contractName: "SETH",
                 selfETH: {
-                    "0xaa36a7": "0xe21AC5E27721295D7AE87C4536607491e0bC2f67",
+                    "0xaa36a7": "0x1595e1d3DCDB755372D158f6ae586A6377fa256f",
                     "ABI": SelfETHABI,
                     contract: {}
                 },
@@ -281,18 +281,27 @@
                 const walletAddress = ethers.getAddress(this.wallet.getAccount());
                 const signMessage = ethers.toUtf8Bytes(`${this.signTimestamp}`);
                 // const ciphertexts = await this.encrypt(coldAddress);
+
+                // public decrypt
+                const gasLimit0 = await this.selfETH.contract.requestWithdraw.estimateGas(ethers.parseEther(this.inputAmount));
+                let options0 = { from: walletAddress, gasLimit: BigInt(gasLimit0), gasPrice: (await this.wallet.provider.getFeeData()).gasPrice };//, nonce: nonce}
+                const sentTx0 = await this.selfETH.contract.requestWithdraw(ethers.parseEther(this.inputAmount), options0);
+                await sentTx0.wait(1);
+                const eamount = await this.selfETH.contract.waitWithdrawAmount();
+                const decryptedResults = await window.fheInstance.publicDecrypt([eamount]);
+                console.log("decryptedResults:", decryptedResults)
                 
                 if (this.hotSign) {
                     this.signTimestamp = "";
-                    const gasLimit = await this.selfETH.contract.privateWithdraw.estimateGas(ethers.parseEther(this.inputAmount));
+                    const gasLimit = await this.selfETH.contract.privateWithdraw.estimateGas(ethers.parseEther(this.inputAmount), decryptedResults.decryptionProof);
                     let options = { from: walletAddress, gasLimit: BigInt(gasLimit), gasPrice: (await this.wallet.provider.getFeeData()).gasPrice };//, nonce: nonce}
-                    const sentTx = await this.selfETH.contract.privateWithdraw(ethers.parseEther(this.inputAmount), options);
+                    const sentTx = await this.selfETH.contract.privateWithdraw(ethers.parseEther(this.inputAmount), decryptedResults.decryptionProof, options);
                     await sentTx.wait(1);
                     return sentTx.hash;
                 } else {
-                    const gasLimit = await this.selfETH.contract.privateWithdrawForCold.estimateGas(this.offlineSignature, signMessage, ethers.parseEther(this.inputAmount), BigInt(this.signTimestamp));
+                    const gasLimit = await this.selfETH.contract.privateWithdrawForCold.estimateGas(this.offlineSignature, signMessage, ethers.parseEther(this.inputAmount), BigInt(this.signTimestamp), decryptedResults.decryptionProof);
                     let options = { from: walletAddress, gasLimit: BigInt(gasLimit), gasPrice: (await this.wallet.provider.getFeeData()).gasPrice };//, nonce: nonce}
-                    const sentTx = await this.selfETH.contract.privateWithdrawForCold(this.offlineSignature, signMessage, ethers.parseEther(this.inputAmount), BigInt(this.signTimestamp), options);
+                    const sentTx = await this.selfETH.contract.privateWithdrawForCold(this.offlineSignature, signMessage, ethers.parseEther(this.inputAmount), BigInt(this.signTimestamp), decryptedResults.decryptionProof, options);
                     await sentTx.wait(1);
                     return sentTx.hash;
                 }
