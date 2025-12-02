@@ -19,9 +19,9 @@
 
 pragma solidity ^0.8.0;
 
-import { FHE, eaddress, externalEaddress, euint128, euint128, externalEuint128, ebool} from "./node_modules/@fhevm/solidity/lib/FHE.sol";
-import { ZamaEthereumConfig } from "./node_modules/@fhevm/solidity/config/ZamaConfig.sol";
-import './node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
+import { FHE, eaddress, externalEaddress, euint128, euint128, externalEuint128, ebool} from "@fhevm/solidity/lib/FHE.sol";
+import { ZamaEthereumConfig } from "@fhevm/solidity/config/ZamaConfig.sol";
+import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 
 contract SETH is ZamaEthereumConfig {
     using ECDSA for bytes32;
@@ -132,11 +132,11 @@ contract SETH is ZamaEthereumConfig {
         require(privData.operateNonce < nonce, "Invalid signature");
         require(privData.coldHash == coldHash, "Permission denied");
 
-        // // withdraw amount check
-        // bytes memory abiWithdrawAmount = abi.encode([amount]);
-        // bytes32[] memory ciphertextEbalance = new bytes32[](1);
-        // ciphertextEbalance[0] = FHE.toBytes32(privData.waitWithdrawAmount);
-        // FHE.checkSignatures(ciphertextEbalance, abiWithdrawAmount, publicDecryptionProof);
+        // withdraw amount check
+        bytes memory abiWithdrawAmount = abi.encode(amount);
+        bytes32[] memory ciphertextEbalance = new bytes32[](1);
+        ciphertextEbalance[0] = FHE.toBytes32(privData.waitWithdrawAmount);
+        FHE.checkSignatures(ciphertextEbalance, abiWithdrawAmount, publicDecryptionProof);
 
         _withdraw(cold, amount);
         
@@ -152,13 +152,11 @@ contract SETH is ZamaEthereumConfig {
     function privateWithdraw(uint128 amount, bytes memory publicDecryptionProof) public {
         PrivateData memory privData = _privateDataOf[msg.sender];
 
-        require(address(this).balance * privData.hotWithdrawMax > amount, "Exceeding the maximum withdrawal limit");
-
-        // // withdraw amount check
-        // bytes memory abiWithdrawAmount = abi.encode([amount]);
-        // bytes32[] memory ciphertextEbalance = new bytes32[](1);
-        // ciphertextEbalance[0] = FHE.toBytes32(privData.waitWithdrawAmount);
-        // FHE.checkSignatures(ciphertextEbalance, abiWithdrawAmount, publicDecryptionProof);
+        // withdraw amount check
+        bytes memory abiWithdrawAmount = abi.encode(amount);
+        bytes32[] memory ciphertextEbalance = new bytes32[](1);
+        ciphertextEbalance[0] = FHE.toBytes32(privData.waitWithdrawAmount);
+        FHE.checkSignatures(ciphertextEbalance, abiWithdrawAmount, publicDecryptionProof);
 
         _withdraw(msg.sender, amount);
 
