@@ -1,4 +1,4 @@
-# SelfWeb3
+# SelfVault
 
 ## Project setup
 ```
