@@ -16,7 +16,30 @@
 .idea
 .backup
 .DS_Store
+*.log
+.pnp.*
+coverage.json
+pnpm-lock.yaml
+yarn.lock
 
 out/
 cache/
 node_modules/
+.coverage_artifacts
+.coverage_cache
+.coverage_contracts
+artifacts
+build
+cache
+coverage
+dist
+node_modules
+types
+deployments
+tmp
+
+# fhevm
+fhevmTemp
+
+
+

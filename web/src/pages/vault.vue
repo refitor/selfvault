@@ -131,7 +131,7 @@
                 coinName: "ETH",
                 contractName: "SETH",
                 selfETH: {
-                    "0xaa36a7": "0x13EbB30b0Fd8DfA4e417B1A111aA5534045cFbe0",
+                    "0xaa36a7": "0xdf8d741789eF65aC60d9440bF53c5BeA42CbbAD2",
                     "ABI": SelfETHABI,
                     contract: {}
                 },
@@ -160,6 +160,8 @@
             init() {
                 this.wallet = this.$parent.getWallet();
                 this.$parent.getWallet().Init().then(async () => {
+                    
+
                     this.selfETH.contract = this.wallet.getContract(this.selfETH[this.wallet.chainId], this.selfETH.ABI);
                     await this.waitForInstance();
                     await this.updateBalance();
@@ -223,7 +225,7 @@
                 this.popModal = false;
                 this.hideSpin = false;
                 new Promise(async (resolve, reject) => {
-                    // try {
+                    try {
                         const txhash = await func();
                         if (txhash !== "") {
                             self.sentTxHash = txhash;
@@ -231,17 +233,17 @@
                             await self.updateBalance();
                         }
                         self.hideSpin = true;
-                    // } catch (err) {
-                    //     console.log(`${this.modalMode} failed, error: ${err}`)
-                    //     this.$Message.error({
-                    //         content: `send tx failed, error: ${err.message}`,
-                    //         closable: true,
-                    //         duration: 10
-                    //     });
-                    //     this.signTimestamp = "";
-                    //     this.offlineSignature = "";
-                    //     self.hideSpin = true;
-                    // }
+                    } catch (err) {
+                        console.log(`${this.modalMode} failed, error: ${err}`)
+                        this.$Message.error({
+                            content: `send tx failed, error: ${err.message}`,
+                            closable: true,
+                            duration: 10
+                        });
+                        this.signTimestamp = "";
+                        this.offlineSignature = "";
+                        self.hideSpin = true;
+                    }
                 });
             },
             async deposit() {
@@ -282,16 +284,16 @@
                 const signMessage = ethers.toUtf8Bytes(`${this.signTimestamp}`);
                 // const ciphertexts = await this.encrypt(coldAddress);
 
-                // // public decrypt
-                // const gasLimit0 = await this.selfETH.contract.requestWithdraw.estimateGas(ethers.parseEther(this.inputAmount));
-                // let options0 = { from: walletAddress, gasLimit: BigInt(gasLimit0), gasPrice: (await this.wallet.provider.getFeeData()).gasPrice };//, nonce: nonce}
-                // const sentTx0 = await this.selfETH.contract.requestWithdraw(ethers.parseEther(this.inputAmount), options0);
-                // await sentTx0.wait(1);
-                // const eamount = await this.selfETH.contract.waitWithdrawAmount();
-                // console.log("waitWithdrawAmount:", eamount)
-                // const decryptedResults = await window.fheInstance.publicDecrypt([eamount]);
-                // console.log("waitWithdrawAmount:", eamount, "decryptedResults:", decryptedResults);
-                const decryptedResults = {decryptionProof: await this.selfETH.contract.getColdHash(walletAddress)}
+                // public decrypt
+                const gasLimit0 = await this.selfETH.contract.requestWithdraw.estimateGas(ethers.parseEther(this.inputAmount));
+                let options0 = { from: walletAddress, gasLimit: BigInt(gasLimit0), gasPrice: (await this.wallet.provider.getFeeData()).gasPrice };//, nonce: nonce}
+                const sentTx0 = await this.selfETH.contract.requestWithdraw(ethers.parseEther(this.inputAmount), options0);
+                await sentTx0.wait(1);
+                const eamount = await this.selfETH.contract.waitWithdrawAmount();
+                console.log("waitWithdrawAmount:", eamount)
+                const decryptedResults = await window.fheInstance.publicDecrypt([eamount]);
+                console.log("waitWithdrawAmount:", eamount, "decryptedResults:", decryptedResults);
+                // const decryptedResults = {decryptionProof: await this.selfETH.contract.getColdHash(walletAddress)}
                 
                 if (this.hotSign) {
                     this.signTimestamp = "";

@@ -12,18 +12,12 @@
     </script> 
   </head>
   <body>
-    <!-- <script
-        src="/fhevm/relayer-sdk.umd.cjs"
-        type="text/javascript"
-    ></script> -->
     <script type="module">
         import {
           initSDK,
           createInstance,
           SepoliaConfig,
-        // } from "https://cdn.zama.ai/relayer-sdk-js/0.2.0/relayer-sdk-js.umd.cjs";
-        } from 'https://refitor.github.io/selfvault/dapp/fhevm/relayer-sdk-js.js';
-    // } from 'http://localhost:5173/selfvault/dapp/fhevm/relayer-sdk-js.js';
+        } from "https://cdn.zama.org/relayer-sdk-js/0.3.0-5/relayer-sdk-js.js";
       
         await initSDK();
         const config = { ...SepoliaConfig, network: window.ethereum };
