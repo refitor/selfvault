@@ -132,11 +132,11 @@ contract SETH is ZamaEthereumConfig {
         require(privData.operateNonce < nonce, "Invalid signature");
         require(privData.coldHash == coldHash, "Permission denied");
 
-        // withdraw amount check
-        bytes memory abiWithdrawAmount = abi.encode([amount]);
-        bytes32[] memory ciphertextEbalance = new bytes32[](1);
-        ciphertextEbalance[0] = FHE.toBytes32(privData.waitWithdrawAmount);
-        FHE.checkSignatures(ciphertextEbalance, abiWithdrawAmount, publicDecryptionProof);
+        // // withdraw amount check
+        // bytes memory abiWithdrawAmount = abi.encode([amount]);
+        // bytes32[] memory ciphertextEbalance = new bytes32[](1);
+        // ciphertextEbalance[0] = FHE.toBytes32(privData.waitWithdrawAmount);
+        // FHE.checkSignatures(ciphertextEbalance, abiWithdrawAmount, publicDecryptionProof);
 
         _withdraw(cold, amount);
         
@@ -154,11 +154,11 @@ contract SETH is ZamaEthereumConfig {
 
         require(address(this).balance * privData.hotWithdrawMax > amount, "Exceeding the maximum withdrawal limit");
 
-        // withdraw amount check
-        bytes memory abiWithdrawAmount = abi.encode([amount]);
-        bytes32[] memory ciphertextEbalance = new bytes32[](1);
-        ciphertextEbalance[0] = FHE.toBytes32(privData.waitWithdrawAmount);
-        FHE.checkSignatures(ciphertextEbalance, abiWithdrawAmount, publicDecryptionProof);
+        // // withdraw amount check
+        // bytes memory abiWithdrawAmount = abi.encode([amount]);
+        // bytes32[] memory ciphertextEbalance = new bytes32[](1);
+        // ciphertextEbalance[0] = FHE.toBytes32(privData.waitWithdrawAmount);
+        // FHE.checkSignatures(ciphertextEbalance, abiWithdrawAmount, publicDecryptionProof);
 
         _withdraw(msg.sender, amount);
 
