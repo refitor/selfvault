@@ -5,7 +5,7 @@
     <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <title>SelfWeb3</title>
+    <title>SelfVault</title>
     <script type="module">
       import { Buffer } from "buffer";
       window.Buffer = Buffer;
@@ -22,8 +22,8 @@
           createInstance,
           SepoliaConfig,
         // } from "https://cdn.zama.ai/relayer-sdk-js/0.2.0/relayer-sdk-js.umd.cjs";
-        } from 'https://refitor.github.io/selfvault/dapp/fhevm/relayer-sdk-js.js';
-    // } from 'http://localhost:5173/fhevm/relayer-sdk-js.js';
+        // } from 'https://refitor.github.io/selfvault/dapp/fhevm/relayer-sdk-js.js';
+    } from 'http://localhost:5173/selfvault/dapp/fhevm/relayer-sdk-js.js';
       
         await initSDK();
         const config = { ...SepoliaConfig, network: window.ethereum };
