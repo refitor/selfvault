@@ -25,6 +25,7 @@ For detailed instructions see:
 
    ```bash
    npx hardhat vars set PRIVATE_KEY
+   npx hardhat vars set PRIVATE_KEY1
 
    # Set your Infura API key for network access
    npx hardhat vars set INFURA_API_KEY

@@ -10,12 +10,11 @@ import { vars } from "hardhat/config";
 import "solidity-coverage";
 
 import "./tasks/accounts";
-import "./tasks/FHECounter";
 
 // Run 'npx hardhat vars setup' to see the list of variables that need to be set
 
-
 const PRIVATE_KEY: string = vars.get("PRIVATE_KEY", "0x0000000");
+const PRIVATE_KEY1: string = vars.get("PRIVATE_KEY1", "0x0000000");
 const MNEMONIC: string = vars.get("MNEMONIC", "test test test test test test test test test test test junk");
 
 const config: HardhatUserConfig = {
@@ -50,7 +49,7 @@ const config: HardhatUserConfig = {
       url: "http://localhost:8545",
     },
     sepolia: {
-      accounts: [PRIVATE_KEY],
+      accounts: [PRIVATE_KEY, PRIVATE_KEY1],
       chainId: 11155111,
       url: `https://ethereum-sepolia-public.nodies.app`,
     },
