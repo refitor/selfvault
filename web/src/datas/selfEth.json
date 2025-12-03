@@ -148,6 +148,25 @@
     },
     {
       "type": "function",
+      "name": "getMessageHash",
+      "inputs": [
+        {
+          "name": "_message",
+          "type": "string",
+          "internalType": "string"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "pure"
+    },
+    {
+      "type": "function",
       "name": "keySignatureVerify",
       "inputs": [
         {
@@ -157,8 +176,8 @@
         },
         {
           "name": "message",
-          "type": "bytes",
-          "internalType": "bytes"
+          "type": "bytes32",
+          "internalType": "bytes32"
         }
       ],
       "outputs": [
@@ -285,8 +304,8 @@
         },
         {
           "name": "message",
-          "type": "bytes",
-          "internalType": "bytes"
+          "type": "bytes32",
+          "internalType": "bytes32"
         },
         {
           "name": "amount",
@@ -319,6 +338,35 @@
       ],
       "outputs": [],
       "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "splitSignature",
+      "inputs": [
+        {
+          "name": "sig",
+          "type": "bytes",
+          "internalType": "bytes"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "r",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "s",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "v",
+          "type": "uint8",
+          "internalType": "uint8"
+        }
+      ],
+      "stateMutability": "pure"
     },
     {
       "type": "function",
