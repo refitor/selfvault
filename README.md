@@ -43,4 +43,4 @@
 ![coldhash-verify](https://refitor.github.io/selfvault/imgs/coldhash_verify.png)
 
 ### ColdWallet receive ETH
-![coldhash-verify](https://refitor.github.io/selfvault/imgs/coldwallet_received.png)
+![coldwallet-received](https://refitor.github.io/selfvault/imgs/coldwallet_received.png)
