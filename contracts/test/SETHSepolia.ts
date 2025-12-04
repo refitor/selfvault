@@ -48,7 +48,7 @@ describe("SETH", function () {
         steps = 10;
 
         this.timeout(4 * 40000);
-        const depositAmount = "0.0011";
+        const depositAmount = "0.001";
         const coldAddress = signers.bob.address;
 
         // init
@@ -110,7 +110,7 @@ describe("SETH", function () {
         progress(
             `Call privateDeposit SETH=${selfEthContractAddress} handle=${ethers.hexlify(encryptedZero.handles[0])} signer=${signers.bob.address}...`,
         );
-        let options = { from: signers.alice.address, value: ethers.parseEther(depositAmount) };//, nonce: nonce}
+        let options = { from: signers.bob.address, value: ethers.parseEther(depositAmount) };//, nonce: nonce}
         let tx = await selfEthContract2
             .connect(signers.bob)
             .privateDeposit(coldHash, BigInt(1), options);
@@ -126,7 +126,7 @@ describe("SETH", function () {
             .encrypt();
 
         // transfer
-        const coldHash1 = await selfEthContract2.getColdHash(signers.alice.address);
+        const coldHash1 = await selfEthContract.getColdHash(signers.alice.address);
         progress(
             `Call privateDeposit SETH=${selfEthContractAddress} handle=${ethers.hexlify(encryptedTransfer.handles[0])} signer=${signers.bob.address}...`,
         );
@@ -219,8 +219,8 @@ describe("SETH", function () {
 
         // verify balance
         const afterWithdrawBalance = await ethers.provider.getBalance(signers.alice.address);
-        progress(`after offline withdraw, afterWithdrawBalance=${ethers.formatEther(afterWithdrawBalance)}, offlineWithdrawAmount=${ethers.formatEther(offlineWithdrawAmount)}...`);
         const hotWithdrawAmount = afterWithdrawBalance - beforeWithdrawBalance;
+        progress(`after offline withdraw, afterWithdrawBalance=${ethers.formatEther(afterWithdrawBalance)}, hotWithdrawAmount=${ethers.formatEther(hotWithdrawAmount)}...`);
         expect(hotWithdrawAmount).to.lt(ethers.parseEther(withdrawAmount));
         expect(hotWithdrawAmount).to.gt(0);
     });
