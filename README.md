@@ -9,13 +9,22 @@
 #### 2. Only one hot wallet can be bound to a cold wallet, privacy-protected assets cannot be transferred to it if it is not bound.
 #### 3. Deposits from any wallet to the cold wallet are supported, the cold wallet address is encrypted and hidden on the blockchain.
 #### 4. Transfers of privacy-protected assets from cold wallet to other cold wallet addresses are supported, the transfer address and deposit amount are encrypted and hidden on the blockchain.
-#### 5. Hot wallets can perform withdrawals with offline signatures from the cold wallet, and withdrawals are only supported to cold wallets.
+#### 5. Hot wallets can perform withdrawals with offline signatures from the cold wallet, and it serves as the entry point for cold wallet operations.
 
-### **Notice: By providing a cold wallet address and a dedicated wallet for offline signing, the cold wallet address can be completely hidden. The coldHash transmitted during the deposit process is one-way encrypted, and no plaintext information related to the cold wallet address will appear on the blockchain**
+## **Notice: By providing a cold wallet address and a dedicated wallet for offline signing, the cold wallet address can be completely hidden. The coldHash transmitted during the deposit process is one-way encrypted, and no plaintext information related to the cold wallet address will appear on the blockchain**
 
 ### **Contract**
 
 #### Sepolia: [0x54c0D3A5D8c6eeE41B2a17247Aaaba97f79d4306](https://sepolia.etherscan.io/address/0x54c0D3A5D8c6eeE41B2a17247Aaaba97f79d4306)
+
+### TODO
+
+- [x] Support wrapping ETH in SETH format and depositing it from a hot wallet to an on-chain encrypted cold wallet address
+- [x] Support SETH transfers, transfer addresses and amounts are encrypted and hidden on-chain
+- [x] Support hot wallet withdrawals of ETH, with withdrawal limits
+- [x] Support offline signature withdrawal of ETH from cold wallets, with no limit on withdrawal amount
+- [ ] Support any wallet to send funds to an encrypted cold wallet via the function transfer and transferFrom
+- [ ] Support multi-party verification to protect on-chain encrypted cold wallet assets, including hot wallet signing and transactions, on-chain TOTP verification, and on-chain WebAuthn verification (on-chain TOTP and WebAuthn verification require decentralized network support, pending......)
 
 ### **Transaction**
 
@@ -44,3 +53,8 @@
 
 ### ColdWallet receive ETH
 ![coldwallet-received](https://refitor.github.io/selfvault/imgs/coldwallet_received.png)
+
+### **Offline sign**
+
+#### **open source tools**: https://github.com/refitor/selfvault/tree/main/offline_sign
+
