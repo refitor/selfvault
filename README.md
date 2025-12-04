@@ -24,7 +24,7 @@
 - [x] Support hot wallet withdrawals of ETH, with withdrawal limits
 - [x] Support offline signature withdrawal of ETH from cold wallets, with no limit on withdrawal amount
 - [ ] Support any wallet to send funds to an encrypted cold wallet via the function transfer and transferFrom
-- [ ] Support multi-party verification to protect on-chain encrypted cold wallet assets, including hot wallet signing and transactions, on-chain TOTP verification, and on-chain WebAuthn verification (on-chain TOTP and WebAuthn verification require decentralized network support, pending......)
+- [ ] Support multi-party real-time verification to protect on-chain encrypted cold wallet assets, including hot wallet signing and transactions, on-chain TOTP verification, and on-chain WebAuthn verification (on-chain TOTP and WebAuthn verification require decentralized network support, pending......)
 
 ### **Transaction**
 
